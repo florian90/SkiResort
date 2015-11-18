@@ -1,2 +1,9 @@
 *.class
-.settings/org.eclipse.jdt.core.prefs
+/nbproject/private/
+/build/
+/dist/
+nbproject/project.xml
+*.properties
+nbproject/build-impl.xml
+build.xml
+manifest.mf
