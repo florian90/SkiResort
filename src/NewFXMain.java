@@ -1,5 +1,8 @@
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -7,84 +10,99 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class NewFXMain extends Application {
-     
-    Circle circle_Red, circle_Green, circle_Blue;
-    double orgSceneX, orgSceneY;
-    double orgTranslateX, orgTranslateY;
-     
-    @Override
-    public void start(Stage primaryStage) {
-         
-        //Create Circles
-        circle_Red = new Circle(50.0f, Color.RED);
-        circle_Red.setCursor(Cursor.HAND);
-        circle_Red.setOnMousePressed(circleOnMousePressedEventHandler);
-        circle_Red.setOnMouseDragged(circleOnMouseDraggedEventHandler);
-         
-        circle_Green = new Circle(50.0f, Color.GREEN);
-        circle_Green.setCursor(Cursor.MOVE);
-        circle_Green.setCenterX(150);
-        circle_Green.setCenterY(150);
-        circle_Green.setOnMousePressed(circleOnMousePressedEventHandler);
-        circle_Green.setOnMouseDragged(circleOnMouseDraggedEventHandler);
-         
-        circle_Blue = new Circle(50.0f, Color.BLUE);
-        circle_Blue.setCursor(Cursor.CROSSHAIR);
-        circle_Blue.setTranslateX(300);
-        circle_Blue.setTranslateY(100);
-        circle_Blue.setOnMousePressed(circleOnMousePressedEventHandler);
-        circle_Blue.setOnMouseDragged(circleOnMouseDraggedEventHandler);
-                 
-        Group root = new Group();
-        root.getChildren().addAll(circle_Red, circle_Green, circle_Blue);
-         
-        primaryStage.setResizable(false);
-        primaryStage.setScene(new Scene(root, 400,350));
-         
-        primaryStage.setTitle("java-buddy");
-        
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(final WindowEvent event) {
-                System.out.println("Test");
-            }
-        });
-        
-        primaryStage.show();
-    }
-    
-    public static void main(String[] args) {
+
+    List<Arrow> arrows = new ArrayList<>();
+
+    public static void main(String[] args) throws Exception {
         launch(args);
     }
-     
-    EventHandler<MouseEvent> circleOnMousePressedEventHandler = 
-        new EventHandler<MouseEvent>() {
- 
-        @Override
-        public void handle(MouseEvent t) {
-            orgSceneX = t.getSceneX();
-            orgSceneY = t.getSceneY();
-            orgTranslateX = ((Circle)(t.getSource())).getTranslateX();
-            orgTranslateY = ((Circle)(t.getSource())).getTranslateY();
+
+    @Override
+    public void start(final Stage stage) throws Exception {
+        Group root = new Group();
+        root.getChildren().addAll(new Arrow());
+
+        stage.setScene(new Scene( root, 400, 400, Color.ALICEBLUE));
+        stage.show();
+    }
+    
+    /*
+    // a draggable anchor displayed around a point.
+    class Anchor extends Circle {
+        Anchor(Color color, DoubleProperty x, DoubleProperty y) {
+            super(x.get(), y.get(), 10);
+            setFill(color.deriveColor(1, 1, 1, 0.5));
+            setStroke(color);
+            setStrokeWidth(2);
+            setStrokeType(StrokeType.OUTSIDE);
+
+            x.bind(centerXProperty());
+            y.bind(centerYProperty());
+            enableDrag();
         }
-    };
-     
-    EventHandler<MouseEvent> circleOnMouseDraggedEventHandler = 
-        new EventHandler<MouseEvent>() {
- 
-        @Override
-        public void handle(MouseEvent t) {
-            double offsetX = t.getSceneX() - orgSceneX;
-            double offsetY = t.getSceneY() - orgSceneY;
-            double newTranslateX = orgTranslateX + offsetX;
-            double newTranslateY = orgTranslateY + offsetY;
-             
-            ((Circle)(t.getSource())).setTranslateX(newTranslateX);
-            ((Circle)(t.getSource())).setTranslateY(newTranslateY);
+
+        // make a node movable by dragging it around with the mouse.
+        private void enableDrag() {
+            final Delta dragDelta = new Delta();
+            setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    // record a delta distance for the drag and drop operation.
+                    dragDelta.x = getCenterX() - mouseEvent.getX();
+                    dragDelta.y = getCenterY() - mouseEvent.getY();
+                    getScene().setCursor(Cursor.MOVE);
+                }
+            });
+            setOnMouseReleased(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    getScene().setCursor(Cursor.HAND);
+                }
+            });
+            setOnMouseDragged(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    double newX = mouseEvent.getX() + dragDelta.x;
+                    if (newX > 0 && newX < getScene().getWidth()) {
+                        setCenterX(newX);
+                    }
+                    double newY = mouseEvent.getY() + dragDelta.y;
+                    if (newY > 0 && newY < getScene().getHeight()) {
+                        setCenterY(newY);
+                    }
+
+                    // update arrow positions
+                    for (ArrowHead arrow : arrows) {
+                        arrow.update();
+                    }
+                }
+            });
+            setOnMouseEntered(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    if (!mouseEvent.isPrimaryButtonDown()) {
+                        getScene().setCursor(Cursor.HAND);
+                    }
+                }
+            });
+            setOnMouseExited(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    if (!mouseEvent.isPrimaryButtonDown()) {
+                        getScene().setCursor(Cursor.DEFAULT);
+                    }
+                }
+            });
         }
-    };
+
+        // records relative x and y co-ordinates.
+        private class Delta {
+
+            double x, y;
+        }
+    }*/
 }

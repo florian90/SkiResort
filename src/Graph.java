@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Stack;
 
 public class Graph {
-	private List<Vertex> m_vertices;
-	private List<Edge> m_edges;
+	public List<Vertex> m_vertices;
+	public List<Edge> m_edges;
 
 	public Graph(String fileName) {
 		m_vertices = new ArrayList<Vertex>();
