@@ -1,7 +1,36 @@
+import java.util.ArrayList;
+import java.util.List;
 
-public class CubicCurveManipulatorWithArrows extends Application {
+import javafx.application.Application;
+import static javafx.application.Application.launch;
+import javafx.beans.property.DoubleProperty;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.CubicCurve;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeType;
+import javafx.scene.transform.Rotate;
+import javafx.stage.Stage;
+
+/** 
+ * Example of how a cubic curve works, drag the anchors around to change the curve.
+ * Extended with arrows with the help of José Pereda: http://stackoverflow.com/questions/26702519/javafx-line-curve-with-arrow-head 
+ * Original code by jewelsea: http://stackoverflow.com/questions/13056795/cubiccurve-javafx
+ */
+public class Example extends Application {
+
     List<Arrow> arrows = new ArrayList<Arrow>();
+
     public static class Arrow extends Polygon {
+
         public double rotate;
         public float t;
         CubicCurve curve;
@@ -22,30 +51,47 @@ public class CubicCurveManipulatorWithArrows extends Application {
         }
 
         private void init() {
+
             setFill(Color.web("#ff0900"));
+
             rz = new Rotate();
             {
                 rz.setAxis(Rotate.Z_AXIS);
             }
             getTransforms().addAll(rz);
+
             update();
         }
 
         public void update() {
             double size = Math.max(curve.getBoundsInLocal().getWidth(), curve.getBoundsInLocal().getHeight());
             double scale = size / 4d;
+
             Point2D ori = eval(curve, t);
             Point2D tan = evalDt(curve, t).normalize().multiply(scale);
+
             setTranslateX(ori.getX());
             setTranslateY(ori.getY());
+
             double angle = Math.atan2( tan.getY(), tan.getX());
+
             angle = Math.toDegrees(angle);
+
+            // arrow origin is top => apply offset
             double offset = -90;
             if( t > 0.5)
                 offset = +90;
+
             rz.setAngle(angle + offset);
+
         }
 
+          /**
+           * Evaluate the cubic curve at a parameter 0<=t<=1, returns a Point2D
+           * @param c the CubicCurve 
+           * @param t param between 0 and 1
+           * @return a Point2D 
+           */
           private Point2D eval(CubicCurve c, float t){
               Point2D p=new Point2D(Math.pow(1-t,3)*c.getStartX()+
                       3*t*Math.pow(1-t,2)*c.getControlX1()+
@@ -58,6 +104,12 @@ public class CubicCurveManipulatorWithArrows extends Application {
               return p;
           }
 
+          /**
+           * Evaluate the tangent of the cubic curve at a parameter 0<=t<=1, returns a Point2D
+           * @param c the CubicCurve 
+           * @param t param between 0 and 1
+           * @return a Point2D 
+           */
           private Point2D evalDt(CubicCurve c, float t){
               Point2D p=new Point2D(-3*Math.pow(1-t,2)*c.getStartX()+
                       3*(Math.pow(1-t, 2)-2*t*(1-t))*c.getControlX1()+
@@ -71,29 +123,35 @@ public class CubicCurveManipulatorWithArrows extends Application {
           }
     }
 
-  public static void main(String[] args) throws Exception { launch(args); }
+  //public static void main(String[] args) throws Exception { launch(args); }
+  
+  /************************************************************************************************************************************************************/
   @Override public void start(final Stage stage) throws Exception {
     CubicCurve curve = createStartingCurve();
-    Line controlLine1 = new BoundLine(curve.controlX1Property(), curve.controlY1Property(), curve.startXProperty(), curve.startYProperty());
-    Line controlLine2 = new BoundLine(curve.controlX2Property(), curve.controlY2Property(), curve.endXProperty(),   curve.endYProperty());
+
     Anchor start    = new Anchor(Color.PALEGREEN, curve.startXProperty(),    curve.startYProperty());
-    Anchor control1 = new Anchor(Color.GOLD,      curve.controlX1Property(), curve.controlY1Property());
-    Anchor control2 = new Anchor(Color.GOLDENROD, curve.controlX2Property(), curve.controlY2Property());
     Anchor end      = new Anchor(Color.TOMATO,    curve.endXProperty(),      curve.endYProperty());
+
     Group root = new Group();
-    root.getChildren().addAll( controlLine1, controlLine2, curve, start, control1, control2, end);
+    Group gr = new Group();
+    root.getChildren().addAll(curve, start, end);
+
     double[] arrowShape = new double[] { 0,0,10,20,-10,20 };
+
     arrows.add( new Arrow( curve, 0f, arrowShape));
-    arrows.add( new Arrow( curve, 0.2f, arrowShape));
-    arrows.add( new Arrow( curve, 0.4f, arrowShape));
-    arrows.add( new Arrow( curve, 0.6f, arrowShape));
-    arrows.add( new Arrow( curve, 0.8f, arrowShape));
     arrows.add( new Arrow( curve, 1f, arrowShape));
     root.getChildren().addAll( arrows);
-    stage.setTitle("Cubic Curve Manipulation Sample");
+    
+    gr.getChildren().addAll(arrows);
+    gr.getChildren().addAll(curve);
+    
+    
+    
+    stage.setTitle("Example");
     stage.setScene(new Scene( root, 400, 400, Color.ALICEBLUE));
     stage.show();
   }
+
 
 private CubicCurve createStartingCurve() {
     CubicCurve curve = new CubicCurve();
@@ -112,19 +170,7 @@ private CubicCurve createStartingCurve() {
     return curve;
   }
 
-  class BoundLine extends Line {
-    BoundLine(DoubleProperty startX, DoubleProperty startY, DoubleProperty endX, DoubleProperty endY) {
-      startXProperty().bind(startX);
-      startYProperty().bind(startY);
-      endXProperty().bind(endX);
-      endYProperty().bind(endY);
-      setStrokeWidth(2);
-      setStroke(Color.GRAY.deriveColor(0, 1, 1, 0.5));
-      setStrokeLineCap(StrokeLineCap.BUTT);
-      getStrokeDashArray().setAll(10.0, 5.0);
-    }
-  }
-
+  // a draggable anchor displayed around a point.
   class Anchor extends Circle { 
     Anchor(Color color, DoubleProperty x, DoubleProperty y) {
       super(x.get(), y.get(), 10);
@@ -132,11 +178,13 @@ private CubicCurve createStartingCurve() {
       setStroke(color);
       setStrokeWidth(2);
       setStrokeType(StrokeType.OUTSIDE);
+
       x.bind(centerXProperty());
       y.bind(centerYProperty());
       enableDrag();
     }
 
+    // make a node movable by dragging it around with the mouse.
     private void enableDrag() {
       final Delta dragDelta = new Delta();
       setOnMousePressed(new EventHandler<MouseEvent>() {
