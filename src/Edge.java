@@ -61,6 +61,11 @@ public class Edge {
 		return m_to;
 	}
 	
+	public Vertex getdeparture()
+	{
+		return m_from;
+	}
+	
 	public RoadType getType()
 	{
 		return m_type;

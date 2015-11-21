@@ -1,33 +1,81 @@
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import javafx.application.Application;
-import javafx.beans.property.DoubleProperty;
-import javafx.event.EventHandler;
-import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 
-public class NewFXMain extends Application {
-    Arrow a1;
-    Group g;
 
-    public static void main(String[] args) throws Exception {launch(args);}
+public class NewFXMain extends Application {
+
+    Group root;
+    Graph graph;
+    ViewGraph viewGraph;
+
+    public static void main(String[] args) throws Exception {
+        launch(args);
+    }
 
     @Override
     public void start(final Stage stage) throws Exception {
-        g = new Group();
-        a1 = new Arrow(360, 101, 30, 100, 1);
-        //Arrow a2 = new Arrow(30, 100, 360, 101, -1);
-        g.getChildren().addAll(a1);
-        //g.getChildren().addAll(a2);
-
-        stage.setScene(new Scene( g, 1600, 900, Color.ALICEBLUE));
+        root = new Group();
+        graph = new Graph("dataski.txt");
+        viewGraph = new ViewGraph(graph);
+        root.getChildren().addAll(viewGraph);
+        
+        stage.setScene(new Scene(root, Positions.WIDTH, Positions.HEIGHT, Color.ALICEBLUE));
         stage.show();
+    }
+
+    public class ViewGraph extends Group {
+
+        Graph graph;
+        Group vertices;
+        Group edges;
+
+        ViewGraph(Graph gr) {
+            graph = gr;
+            init();
+        }
+
+        private void init() {
+            vertices = new Group();
+            edges = new Group();
+            Positions pos = new Positions();
+            Point pt;
+            // Add vertices
+            for (Vertex v : graph.m_vertices) {
+                vertices.getChildren().add(new ViewVertex(v));
+            }
+            // Add edges
+            for(Edge e : graph.m_edges){
+                edges.getChildren().add(new Arrow(e));
+            }
+            
+            getChildren().addAll(vertices);
+        }
+    }
+
+    public class ViewVertex extends Group {
+        Vertex vertex;
+        Circle c;
+        float R = 20;
+
+        ViewVertex(Vertex v) {
+            Point pt;
+            Positions pos = new Positions();
+            vertex = v;
+
+            pt = pos.get(v.getId());
+            c = new Circle(pt.x, pt.y, R);
+            c.setFill(Color.YELLOW);
+            c.setStroke(Color.BLACK);
+            
+            this.getChildren().addAll(c);
+        }
     }
 }
