@@ -8,28 +8,75 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.transform.Rotate;
 
 public class Arrow extends Group {
+
     private final float DISTANCE = 25;
 
     private int nb;
     public ArrowHead arrowHead;
     public CubicCurve curve;
     private float x1, y1, x2, y2;
-    
-    private Edge e;
-    
+
+    private Color col;
+
+    private Edge edge;
+
     private final double[] arrowShape = new double[]{0, 0, 10, 20, -10, 20};
 
-    public Arrow(int x1, int y1, int x2, int y2, int offset) {
-        nb = offset;
+    public Arrow(Edge e) {
+        Positions pos = new Positions();
+        edge = e;
+
+        x1 = pos.get(e.getDeparture().getId()).x;
+        y1 = pos.get(e.getDeparture().getId()).y;
+        x2 = pos.get(e.getArrival().getId()).x;
+        y2 = pos.get(e.getArrival().getId()).y;
+
+        nb = 0;
+        for (Edge edge : e.getDeparture().getOutList()) {
+            if (edge == e) {
+                break;
+            }
+            if (edge.getArrival() == e.getArrival()) {
+                nb++;
+            }
+        }
+        if (e.getArrival().getId() > e.getDeparture().getId()) {
+            nb -= nb + 1;
+        }
         curve = new CubicCurve();
-        init((float) x1, (float) y1, (float) x2, (float) y2);
+        init(x1, y1, x2, y2);
         update();
-        arrowHead = new ArrowHead(curve, 1f, arrowShape);
+        float dist, pc;
+        dist = (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+        pc = (dist - 15) / dist;
+        arrowHead = new ArrowHead(curve, pc, arrowShape);
+        initColor();
         getChildren().addAll(curve, arrowHead);
     }
-    
-    public Arrow(Edge e) {
-        
+
+    private void initColor() {
+        if (edge.getType() == RoadType.V) {
+            col = Color.GREEN;
+        } else if (edge.getType() == RoadType.B) {
+            col = Color.BLUE;
+        } else if (edge.getType() == RoadType.R) {
+            col = Color.RED;
+        } else if (edge.getType() == RoadType.N) {
+            col = Color.BLACK;
+        } else {
+            col = Color.GRAY;
+        }
+        applyColor(col);
+    }
+
+    public void applyColor(Color color) {
+        curve.setStroke(color);
+        arrowHead.setColor(color);
+    }
+
+    public void applyColor() {
+        curve.setStroke(col);
+        arrowHead.setColor(col);
     }
 
     private void init(float x1, float y1, float x2, float y2) {
@@ -41,8 +88,8 @@ public class Arrow extends Group {
         curve.setStartY(y1);
         curve.setEndX(x2);
         curve.setEndY(y2);
-        curve.setStroke(Color.FORESTGREEN);
-        curve.setStrokeWidth(4);
+        curve.setStroke(Color.GREEN);
+        curve.setStrokeWidth(3);
         curve.setStrokeLineCap(StrokeLineCap.ROUND);
         curve.setFill(Color.TRANSPARENT);
     }
@@ -65,7 +112,6 @@ public class Arrow extends Group {
             float B = 2 * (p * (b - mY) - mX);
             float C = mX * mX + mY * mY + b * b - 2 * b * mY - r * r;
             float delta = B * B - 4 * A * C;
-            System.out.println("p = " + p);
             if (delta > 0) {
                 if (nb > 0) {
                     x = (-B - (float) Math.sqrt(delta)) / (2 * A);
@@ -106,12 +152,17 @@ public class Arrow extends Group {
             super(arg0);
             this.curve = curve;
             this.t = t;
+            setStroke(Color.GREEN);
+            setFill(Color.GREEN);
             init();
         }
 
-        private void init() {
+        public void setColor(Color col) {
+            setStroke(col);
+            setFill(col);
+        }
 
-            setFill(Color.GREEN);
+        private void init() {
 
             rz = new Rotate();
             {

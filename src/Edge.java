@@ -51,6 +51,11 @@ public class Edge {
 		}
 	}
 	
+	public float getId()
+	{
+		return m_id;
+	}
+	
 	public float getTime()
 	{
 		return m_time;
@@ -61,7 +66,7 @@ public class Edge {
 		return m_to;
 	}
 	
-	public Vertex getdeparture()
+	public Vertex getDeparture()
 	{
 		return m_from;
 	}

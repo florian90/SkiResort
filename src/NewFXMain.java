@@ -7,6 +7,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
 
 
@@ -56,13 +57,14 @@ public class NewFXMain extends Application {
                 edges.getChildren().add(new Arrow(e));
             }
             
-            getChildren().addAll(vertices);
+            getChildren().addAll(edges, vertices);
         }
     }
 
     public class ViewVertex extends Group {
         Vertex vertex;
         Circle c;
+        Text text;
         float R = 20;
 
         ViewVertex(Vertex v) {
@@ -75,7 +77,10 @@ public class NewFXMain extends Application {
             c.setFill(Color.YELLOW);
             c.setStroke(Color.BLACK);
             
-            this.getChildren().addAll(c);
+            text = new Text(pt.x-(v.getId() > 10 ? 5 : 3), pt.y+5, ""+v.getId());
+            text.setTextAlignment(TextAlignment.CENTER);
+            
+            this.getChildren().addAll(c, text);
         }
     }
 }
