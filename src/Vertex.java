@@ -12,7 +12,9 @@ public class Vertex implements Comparable<Vertex> {
 	private float m_distance;
 	private Vertex m_prevVertex;
 	private boolean m_mark;
-	
+        
+        public ViewVertex view;
+        
 	public Vertex(int id, String name, int altitude) {
 		m_id = id;
 		m_name = name;
@@ -29,6 +31,11 @@ public class Vertex implements Comparable<Vertex> {
 		return  "Vertex " + m_id + ", " + m_name;
 		//return m_id + ", " + m_name + ", d=" + m_distance + " prev=" + (m_prevVertex != null ? m_prevVertex.m_id:null) + " " + m_mark;
 	}
+        
+        public void setView(ViewVertex v)
+        {
+            view = v;
+        }
 	
 	public void addInEdge(Edge e)
 	{

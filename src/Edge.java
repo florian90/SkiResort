@@ -6,6 +6,8 @@ public class Edge {
 	private RoadType m_type;
 	private Vertex m_from;
 	private Vertex m_to;
+        
+        public Arrow view;
 
 	public Edge(int id, String name, RoadType type, Vertex from, Vertex to) {
 		m_id = id;
@@ -50,6 +52,11 @@ public class Edge {
 			}
 		}
 	}
+        
+        public void setView(Arrow a)
+        {
+            view = a;
+        }
 	
 	public float getId()
 	{

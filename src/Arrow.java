@@ -18,6 +18,8 @@ public class Arrow extends Group {
 
     private Color col;
 
+    public boolean used = false;
+
     private Edge edge;
 
     private final double[] arrowShape = new double[]{0, 0, 10, 20, -10, 20};
@@ -25,6 +27,7 @@ public class Arrow extends Group {
     public Arrow(Edge e) {
         Positions pos = new Positions();
         edge = e;
+        e.setView(this);
 
         x1 = pos.get(e.getDeparture().getId()).x;
         y1 = pos.get(e.getDeparture().getId()).y;
@@ -54,19 +57,23 @@ public class Arrow extends Group {
         getChildren().addAll(curve, arrowHead);
     }
 
-    private void initColor() {
+    public void initColor() {
         if (edge.getType() == RoadType.V) {
             col = Color.GREEN;
         } else if (edge.getType() == RoadType.B) {
             col = Color.BLUE;
         } else if (edge.getType() == RoadType.R) {
             col = Color.RED;
-        } else if (edge.getType() == RoadType.N) {
+        } else if (edge.getType() == RoadType.N || edge.getType() == RoadType.KL || edge.getType() == RoadType.SURF) {
             col = Color.BLACK;
         } else {
             col = Color.GRAY;
         }
         applyColor(col);
+    }
+
+    public void use() {
+        applyColor(Color.ORANGE);
     }
 
     public void applyColor(Color color) {

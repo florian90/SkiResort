@@ -10,7 +10,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 
-
 public class NewFXMain extends Application {
 
     Group root;
@@ -27,60 +26,54 @@ public class NewFXMain extends Application {
         graph = new Graph("dataski.txt");
         viewGraph = new ViewGraph(graph);
         root.getChildren().addAll(viewGraph);
-        
-        stage.setScene(new Scene(root, Positions.WIDTH, Positions.HEIGHT, Color.ALICEBLUE));
+
+        stage.setScene(new Scene(root, Positions.WIDTH + 300, Positions.HEIGHT, Color.ALICEBLUE));
         stage.show();
+
+        findPath(1, 9);
+
+        /*Vertex last = null;
+        Stack<Vertex> res = graph.shortestPath(1, 2, SkiLevel.Expert);
+        System.out.println("Shortest path : ");
+        while (!res.isEmpty()) {
+            System.out.println(last = res.pop());
+        }
+        if (last != null) {
+            System.out.println("Time needed : " + Math.round(last.getDist()) + " mins.");
+        }
+        Vertex v = graph.m_vertices.get(7-1);
+        System.out.println("Time : " + v.getDist());*/
+        
+        //resetColor();
     }
 
-    public class ViewGraph extends Group {
-
-        Graph graph;
-        Group vertices;
-        Group edges;
-
-        ViewGraph(Graph gr) {
-            graph = gr;
-            init();
+    public void findPath(int id_start, int id_end) {
+        Vertex last = null;
+        Stack<Vertex> res = graph.shortestPath(id_start, id_end, SkiLevel.Expert);
+        for (Vertex v : res) {
+            v.view.use();
+            Vertex prev = v.getPrev();
+            if (prev != null) {
+                for (Edge e : prev.getOutList()) {
+                    if (prev.getDist() + e.getTime() == v.getDist()) {
+                        e.view.use();
+                    }
+                }
+            }
         }
-
-        private void init() {
-            vertices = new Group();
-            edges = new Group();
-            Positions pos = new Positions();
-            Point pt;
-            // Add vertices
-            for (Vertex v : graph.m_vertices) {
-                vertices.getChildren().add(new ViewVertex(v));
-            }
-            // Add edges
-            for(Edge e : graph.m_edges){
-                edges.getChildren().add(new Arrow(e));
-            }
-            
-            getChildren().addAll(edges, vertices);
+        if(res.size() == 0) 
+        {
+            System.out.println("No such path ");
         }
     }
 
-    public class ViewVertex extends Group {
-        Vertex vertex;
-        Circle c;
-        Text text;
-        float R = 20;
-
-        ViewVertex(Vertex v) {
-            Point pt;
-            Positions pos = new Positions();
-            vertex = v;
-
-            pt = pos.get(v.getId());
-            c = new Circle(pt.x, pt.y, R);
-            c.setFill(Color.YELLOW);
-            c.setStroke(Color.BLACK);
-            
-            text = new Text(pt.x-(v.getId() > 10 ? 5 : 3), pt.y+5, ""+v.getId());
-            text.setTextAlignment(TextAlignment.CENTER);
-            
-            this.getChildren().addAll(c, text);
+    public void resetColor() {
+        for (Edge e : graph.m_edges) {
+            e.view.initColor();
+        }
+        for(Vertex v : graph.m_vertices)
+        {
+            v.view.resetColor();
         }
     }
 }
