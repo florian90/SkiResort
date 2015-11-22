@@ -6,7 +6,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class ViewVertex extends Group {
-
     Vertex vertex;
     Circle c;
     Text text;

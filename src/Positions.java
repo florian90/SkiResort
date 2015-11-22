@@ -2,21 +2,17 @@
 import java.util.ArrayList;
 
 public class Positions extends ArrayList<Point> {
-    
     public static float WIDTH = 800;
     public static float HEIGHT = 1000;
-    
+
     private float initX = 1218;
     private float initY = 1342;
-    
-    private float factorX = WIDTH / initX;
-    private float factorY = HEIGHT / initY;
-    
+
     public Positions() {
-        add(0,0);
-        add(477,1298); // 1
-        add(551,1158);
-        add(715,1096);
+        add(0, 0);
+        add(477, 1298); // 1
+        add(551, 1158);
+        add(715, 1096);
         add(782, 948);
         add(976, 936); // 5
         add(839, 803);
@@ -51,14 +47,14 @@ public class Positions extends ArrayList<Point> {
         add(44, 435); // 35
         add(323, 223);
         add(526, 145);
-        
-        for(Point pt : this){
-            pt.x = pt.x*factorX;
-            pt.y = pt.y*factorY;
+
+        for (Point pt : this) {
+            pt.x = pt.x * WIDTH / initX;
+            pt.y = pt.y * HEIGHT / initY;
         }
     }
-    
-    private void add(float x, float y){
+
+    private void add(float x, float y) {
         super.add(new Point(x, y));
     }
 }
