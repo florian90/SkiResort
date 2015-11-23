@@ -19,13 +19,30 @@ import javafx.stage.Stage;
 
 public class NewFXMain extends Application {
 
-    private  Group root;
     private Graph graph;
     private ViewGraph viewGraph;
 
     boolean isColored = false;
 
-    final Label lb_res = new Label("Result :\n");
+    private final Group root = new Group();
+    private final Label lb_Title = new Label("Select a level\n and a path : ");
+    private final HBox hud_Level = new HBox();
+    private final Label lb_Level = new Label("Ski level :   ");
+    private ObservableList<String> levelOptions = FXCollections.observableArrayList("Beginer", "Intermediate", "Advanced", "Expert");
+    private final ComboBox cb_Level = new ComboBox(levelOptions);
+    private final HBox hud_start = new HBox();
+    private final Label lb_start = new Label("Departure :");
+    private final TextField txt_start = new TextField();
+    private final HBox hud_end = new HBox();
+    private final HBox hud_but = new HBox();
+    private final Button bt_validate = new Button("Compute !");
+    private final Button bt_reset = new Button("reset");
+    private final Button bt_accVertices = new Button("Find all possible paths");
+    private final Label lb_end = new Label("Arrival :      ");
+    private final TextField txt_end = new TextField();
+    private final Label lb_res = new Label("Result :\n");
+    private final VBox hud_help = new VBox();
+    private final Label[] lb_help = new Label[7];
 
     public static void main(String[] args) throws Exception {
         launch(args);
@@ -33,47 +50,34 @@ public class NewFXMain extends Application {
 
     @Override
     public void start(final Stage stage) throws Exception {
-        root = new Group();
         graph = new Graph("dataski.txt");
         viewGraph = new ViewGraph(graph);
+        root.setLayoutX(10);
         root.getChildren().addAll(viewGraph);
 
-        final Label lb_Title = new Label("Select a level\n and a path : ");
         lb_Title.setLayoutX(Positions.WIDTH + 80);
         lb_Title.setLayoutY(10);
         lb_Title.setFont(Font.font(20));
 
-        final HBox hud_Level = new HBox();
-        final Label lb_Level = new Label("Ski level :   ");
-        ObservableList<String> levelOptions = FXCollections.observableArrayList("Beginer", "Intermediate", "Advanced", "Expert");
-        final ComboBox cb_Level = new ComboBox(levelOptions);
         cb_Level.setValue("Beginer");
         hud_Level.setSpacing(10);
         hud_Level.setLayoutX(Positions.WIDTH + 50);
         hud_Level.setLayoutY(80);
         hud_Level.getChildren().addAll(lb_Level, cb_Level);
 
-        final HBox hud_start = new HBox();
-        final Label lb_start = new Label("Departure :");
-        final TextField txt_start = new TextField();
         hud_start.setSpacing(10);
         hud_start.setLayoutX(Positions.WIDTH + 50);
         hud_start.setLayoutY(120);
         hud_start.getChildren().addAll(lb_start, txt_start);
 
-        final HBox hud_end = new HBox();
-        final Label lb_end = new Label("Arrival :      ");
-        final TextField txt_end = new TextField();
         hud_end.setSpacing(10);
         hud_end.setLayoutX(Positions.WIDTH + 50);
         hud_end.setLayoutY(160);
         hud_end.getChildren().addAll(lb_end, txt_end);
 
-        final HBox hud_but = new HBox();
         hud_but.setSpacing(10);
         hud_but.setLayoutX(Positions.WIDTH + 60);
         hud_but.setLayoutY(200);
-        final Button bt_validate = new Button("Compute !");
         bt_validate.setPrefWidth(100);
         bt_validate.addEventHandler(MouseEvent.MOUSE_CLICKED,
                 new EventHandler<MouseEvent>() {
@@ -90,7 +94,6 @@ public class NewFXMain extends Application {
             }
         }
         );
-        final Button bt_reset = new Button("reset");
         bt_reset.setPrefWidth(100);
         bt_reset.addEventHandler(MouseEvent.MOUSE_CLICKED,
                 new EventHandler<MouseEvent>() {
@@ -100,18 +103,33 @@ public class NewFXMain extends Application {
             }
         }
         );
+
+        bt_accVertices.setLayoutX(Positions.WIDTH + 60);
+        bt_accVertices.setLayoutY(240);
+        bt_accVertices.setPrefWidth(200);
+        bt_accVertices.addEventHandler(MouseEvent.MOUSE_CLICKED,
+                new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent e) {
+                int start;
+                try {
+                    start = Integer.parseInt(txt_start.getText());
+                    getAccessiblePoints(start, cb_Level.getValue().toString());
+                } catch (Exception exep) {
+                }
+            }
+        }
+        );
         hud_but.getChildren().addAll(bt_validate, bt_reset);
 
         lb_res.setFont(Font.font(16));
         lb_res.setLayoutX(Positions.WIDTH + 50);
-        lb_res.setLayoutY(250);
+        lb_res.setLayoutY(290);
 
-        final VBox hud_help = new VBox();
         hud_help.setSpacing(5);
         hud_help.setLayoutX(Positions.WIDTH + 40);
         hud_help.setLayoutY(Positions.HEIGHT - 300);
 
-        final Label[] lb_help = new Label[7];
         lb_help[0] = new Label("Legend :\n");
         lb_help[0].setTextFill(Color.BLACK);
         lb_help[1] = new Label(" - Green slope\n");
@@ -132,7 +150,7 @@ public class NewFXMain extends Application {
             hud_help.getChildren().add(lb_help[i]);
         }
 
-        root.getChildren().addAll(lb_Title, hud_Level, hud_start, hud_end, hud_but, lb_res, hud_help);
+        root.getChildren().addAll(lb_Title, hud_Level, hud_start, hud_end, hud_but, bt_accVertices, lb_res, hud_help);
         stage.setScene(new Scene(root, Positions.WIDTH + 300, Positions.HEIGHT, Color.ALICEBLUE));
         stage.show();
     }
@@ -180,5 +198,26 @@ public class NewFXMain extends Application {
             v.view.resetColor();
         }
         lb_res.setText("Result :\n");
+    }
+
+    public void getAccessiblePoints(int id_start, String skiLevel) {
+        if (isColored) {
+            resetColor();
+        }
+        SkiLevel level = SkiLevel.toValue(skiLevel);
+        Stack<Vertex> res = graph.shortestPath(id_start, id_start, level);
+        isColored = true;
+        System.out.println("Time = " + graph.m_vertices.get(10).getDist());
+        for (Edge e : graph.m_edges) {
+            if (level.isValid(e) && e.getArrival().getDist() != -1 && e.getDeparture().getDist() != -1) {
+                e.view.use();
+            }
+        }
+        for (Vertex v : graph.m_vertices) {
+            if (v.getDist() != -1) {
+                v.view.use();
+            }
+        }
+
     }
 }

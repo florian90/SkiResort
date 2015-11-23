@@ -71,7 +71,7 @@ public class Arrow extends Group {
 
     public void setColor(Color color) {
         curve.setStroke(color);
-        arrowHead.setColor(color); // col
+        arrowHead.setColor(col); // col
     }
 
     private void init(float x1, float y1, float x2, float y2) {
