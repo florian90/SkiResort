@@ -35,14 +35,14 @@ public class NewFXMain extends Application {
     private final TextField txt_start = new TextField();
     private final HBox hud_end = new HBox();
     private final HBox hud_but = new HBox();
-    private final Button bt_validate = new Button("Compute !");
+    private final Button bt_validate = new Button("Compute");
     private final Button bt_reset = new Button("reset");
     private final Button bt_accVertices = new Button("Find all possible paths");
     private final Label lb_end = new Label("Arrival :      ");
     private final TextField txt_end = new TextField();
     private final Label lb_res = new Label("Result :\n");
     private final VBox hud_help = new VBox();
-    private final Label[] lb_help = new Label[7];
+    private final Label[] lb_help = new Label[9];
 
     public static void main(String[] args) throws Exception {
         launch(args);
@@ -106,7 +106,7 @@ public class NewFXMain extends Application {
 
         bt_accVertices.setLayoutX(Positions.WIDTH + 60);
         bt_accVertices.setLayoutY(240);
-        bt_accVertices.setPrefWidth(200);
+        bt_accVertices.setPrefWidth(210);
         bt_accVertices.addEventHandler(MouseEvent.MOUSE_CLICKED,
                 new EventHandler<MouseEvent>() {
             @Override
@@ -128,22 +128,24 @@ public class NewFXMain extends Application {
 
         hud_help.setSpacing(5);
         hud_help.setLayoutX(Positions.WIDTH + 40);
-        hud_help.setLayoutY(Positions.HEIGHT - 300);
+        hud_help.setLayoutY(Positions.HEIGHT - 370);
 
-        lb_help[0] = new Label("Legend :\n");
+        lb_help[0] = new Label("Legend :");
         lb_help[0].setTextFill(Color.BLACK);
-        lb_help[1] = new Label(" - Green slope\n");
+        lb_help[1] = new Label(" - Green slope");
         lb_help[1].setTextFill(Color.GREEN);
         lb_help[2] = new Label(" - Blue slope");
         lb_help[2].setTextFill(Color.BLUE);
-        lb_help[3] = new Label(" - Red slope\n");
+        lb_help[3] = new Label(" - Red slope");
         lb_help[3].setTextFill(Color.RED);
-        lb_help[4] = new Label(" - Black slope / Surf / KL\n");
+        lb_help[4] = new Label(" - Black slope / Surf / KL");
         lb_help[4].setTextFill(Color.BLACK);
         lb_help[5] = new Label(" - Every ski lift\n");
         lb_help[5].setTextFill(Color.GREY);
-        lb_help[6] = new Label(" - Slope used in the path\n");
+        lb_help[6] = new Label(" - Slope used in the path");
         lb_help[6].setTextFill(Color.ORANGE);
+        lb_help[7] = new Label("First, select a ski level");
+        lb_help[8] = new Label("Select a departure and arrival\nand click compute to find\nthe path or only a departure\nto find the acceccible points");
 
         for (int i = 0; i < lb_help.length; i++) {
             lb_help[i].setFont(Font.font(18));
